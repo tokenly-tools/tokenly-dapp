@@ -10,7 +10,11 @@
     "postinstall": "nuxt prepare",
     "db:create": "wrangler d1 execute tokenly --local --file=./schema.sql",
     "init:local": "./scripts/init-local-db.sh",
-    "db:reset": "wrangler d1 execute tokenly --local --command \"DROP TABLE IF EXISTS _prisma_migrations; DROP TABLE IF EXISTS User;\" && npm run init:local"
+    "db:reset": "wrangler d1 execute tokenly --local --command \"DROP TABLE IF EXISTS _prisma_migrations; DROP TABLE IF EXISTS User;\" && npm run init:local",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@prisma/adapter-d1": "^6.11.1",
