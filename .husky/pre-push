@@ -1,0 +1,27 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-push checks..."
+
+# Check if contracts directory exists and has changes
+if [ -d "contracts" ]; then
+  echo "📦 Compiling contracts..."
+  pnpm --filter contracts compile
+  
+  if [ $? -ne 0 ]; then
+    echo "❌ Contract compilation failed!"
+    exit 1
+  fi
+  
+  echo "🧪 Running contract tests..."
+  pnpm --filter contracts test
+  
+  if [ $? -ne 0 ]; then
+    echo "❌ Contract tests failed!"
+    exit 1
+  fi
+  
+  echo "✅ All contract checks passed!"
+fi
+
+echo "🚀 Pre-push checks completed successfully!" 

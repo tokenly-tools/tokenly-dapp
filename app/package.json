@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "nitro-cloudflare-dev": "^0.2.2",
+    "prettier": "^3.2.5",
     "prisma": "^6.11.1",
     "wrangler": "^4.24.3"
   }

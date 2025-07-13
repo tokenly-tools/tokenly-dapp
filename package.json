@@ -7,7 +7,10 @@
     "contracts"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "pnpm --filter app test && pnpm --filter contracts test",
+    "test:contracts": "pnpm --filter contracts test",
+    "compile:contracts": "pnpm --filter contracts compile",
+    "lint:contracts": "pnpm --filter contracts lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint .",
@@ -24,7 +27,8 @@
     "eslint-plugin-vue": "^9.28.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
-    "prettier": "^3.2.5"
+    "prettier": "^3.2.5",
+    "prettier-plugin-solidity": "^1.4.3"
   },
   "lint-staged": {
     "*.{js,ts,vue}": [
@@ -33,6 +37,10 @@
     ],
     "*.{json,md,yaml,yml}": [
       "prettier --write"
+    ],
+    "contracts/**/*.sol": [
+      "pnpm --filter contracts lint:fix",
+      "pnpm --filter contracts format"
     ]
   }
 }

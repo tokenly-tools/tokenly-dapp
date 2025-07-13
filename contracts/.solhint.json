@@ -1,0 +1,33 @@
+{
+  "extends": ["solhint:recommended"],
+  "plugins": ["prettier"],
+  "rules": {
+    "code-complexity": ["error", 7],
+    "compiler-version": ["error", "^0.8.0"],
+    "constructor-syntax": "error",
+    "func-visibility": ["error", { "ignoreConstructors": true }],
+    "max-line-length": ["error", 120],
+    "not-rely-on-time": "off",
+    "prettier/prettier": "error",
+    "reason-string": ["warn", { "maxLength": 50 }],
+    "constructor-modifier-order": "error",
+    "modifier-name-mixedcase": "error",
+    "private-vars-leading-underscore": "error",
+    "use-forbidden-name": "error",
+    "imports-on-top": "error",
+    "ordering": "error",
+    "visibility-modifier-order": "error",
+    "func-name-mixedcase": "error",
+    "var-name-mixedcase": "error",
+    "event-name-camelcase": "error",
+    "const-name-snakecase": "error",
+    "custom-errors": "error",
+    "no-console": "error",
+    "no-empty-blocks": "error",
+    "no-unused-vars": "error",
+    "payable-fallback": "error",
+    "check-send-result": "error",
+    "avoid-suicide": "error",
+    "avoid-sha3": "error"
+  }
+}

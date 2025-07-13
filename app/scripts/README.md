@@ -42,6 +42,7 @@ npm run db:reset
 ```
 
 This will:
+
 1. Delete the existing local D1 database
 2. Re-run the full initialization process
 
@@ -93,4 +94,4 @@ wrangler d1 execute tokenly --local --command "SELECT 1"
 - The local D1 database is stored in your local Wrangler configuration
 - The script includes sample data seeding for testing
 - All operations are performed locally and won't affect production data
-- The script is idempotent - it's safe to run multiple times 
+- The script is idempotent - it's safe to run multiple times
