@@ -1,0 +1,16 @@
+{
+  "name": "tokenly-dapp",
+  "version": "1.0.0",
+  "description": "Your token utilities in one place",
+  "workspaces": [
+    "app",
+    "contracts"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1"
+}

@@ -1,0 +1,8 @@
+name = "tokenly"
+compatibility_date = "2025-07-13"
+compatibility_flags = ["nodejs_compat"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tokenly"
+database_id = "d294b04f-e34c-4296-b5cc-d2a0c0171fe3"
