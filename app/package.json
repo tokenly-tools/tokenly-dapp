@@ -17,6 +17,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@nuxt/eslint": "1.7.0",
     "@prisma/adapter-d1": "^6.11.1",
     "@prisma/client": "6.11.1",
     "@tailwindcss/vite": "^4.1.11",
@@ -34,6 +35,8 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "@nuxt/eslint-config": "^1.5.2",
+    "eslint": "^9.31.0",
     "nitro-cloudflare-dev": "^0.2.2",
     "prettier": "^3.2.5",
     "prisma": "^6.11.1",

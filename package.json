@@ -11,11 +11,11 @@
     "test:contracts": "pnpm --filter contracts test",
     "compile:contracts": "pnpm --filter contracts compile",
     "lint:contracts": "pnpm --filter contracts lint",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "prepare": "husky install"
+    "format": "pnpm --filter app exec prettier --write . && pnpm --filter contracts exec prettier --write .",
+    "format:check": "pnpm --filter app exec prettier --check . && pnpm --filter contracts exec prettier --check .",
+    "lint": "pnpm --filter app exec eslint .",
+    "lint:fix": "pnpm --filter app exec eslint . --fix",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
@@ -31,9 +31,13 @@
     "prettier-plugin-solidity": "^1.4.3"
   },
   "lint-staged": {
-    "*.{js,ts,vue}": [
-      "eslint --fix",
-      "prettier --write"
+    "app/**/*.{js,ts,vue}": [
+      "pnpm --filter app exec eslint --fix",
+      "pnpm --filter app exec prettier --write"
+    ],
+    "contracts/**/*.{js,ts}": [
+      "pnpm --filter contracts exec eslint --fix",
+      "pnpm --filter contracts exec prettier --write"
     ],
     "*.{json,md,yaml,yml}": [
       "prettier --write"

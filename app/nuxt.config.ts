@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
-  modules: ['nitro-cloudflare-dev', 'shadcn-nuxt'],
+  modules: ['nitro-cloudflare-dev', 'shadcn-nuxt', '@nuxt/eslint'],
   vite: {
     plugins: [tailwindcss()],
   },
