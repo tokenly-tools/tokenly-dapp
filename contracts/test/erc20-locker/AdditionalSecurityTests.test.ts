@@ -96,6 +96,51 @@ describe('ERC20Locker - Additional Security Tests', function () {
       );
     });
 
+    it('Should prevent reentrancy during lock creation', async function () {
+      const { erc20Locker, maliciousToken, addr1 } = await loadFixture(
+        deployERC20LockerWithMaliciousTokenFixture
+      );
+
+      const lockAmount = parseEther('100');
+      const currentTime = await time.latest();
+      const endTime = BigInt(currentTime + 3600);
+
+      // Setup malicious token to attack during transferFrom
+      await maliciousToken.write.setAttackParameters([
+        erc20Locker.address,
+        0n, // Will be lockId of lock being created
+        1n, // Single attack attempt
+      ]);
+
+      // Enable attack mode before lock creation
+      await maliciousToken.write.enableAttack();
+
+      // Create lock - should succeed. No reentrancy should occur because
+      // the malicious token only attacks on transfers FROM the locker,
+      // not TO the locker (which happens during lock creation)
+      await erc20Locker.write.lock([
+        addr1.account.address,
+        maliciousToken.address,
+        lockAmount,
+        endTime,
+      ]);
+
+      const attackCount = await maliciousToken.read.attackCount();
+
+      // No attack should have occurred during lock creation since tokens
+      // are transferred TO the locker, not FROM it
+      expect(Number(attackCount)).to.equal(0);
+
+      // Verify lock was created correctly
+      expect(await erc20Locker.read.totalLocks()).to.equal(1n);
+
+      const [owner, token, amount, storedEndTime] =
+        await erc20Locker.read.locks([0n]);
+      expect(owner.toLowerCase()).to.equal(addr1.account.address.toLowerCase());
+      expect(amount).to.equal(lockAmount);
+      expect(storedEndTime).to.equal(endTime);
+    });
+
     it('Should prevent reentrancy in regular withdraw as well', async function () {
       const { erc20Locker, maliciousToken, addr1 } = await loadFixture(
         deployERC20LockerWithMaliciousTokenFixture

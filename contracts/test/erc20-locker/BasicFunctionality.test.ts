@@ -289,6 +289,42 @@ describe('ERC20Locker - Basic Functionality', function () {
       }
     });
 
+    it('Should succeed with minimum valid endTime (current + 1)', async function () {
+      const { erc20Locker, erc20Token, addr1 } = await loadFixture(
+        deployERC20LockerFixture
+      );
+
+      const lockAmount = parseEther('100');
+
+      // Get current time and add sufficient buffer to avoid timing issues
+      const currentTime = await time.latest();
+      const minValidEndTime = BigInt(currentTime + 2); // Use +2 for safety
+
+      // This should succeed
+      await erc20Locker.write.lock([
+        addr1.account.address,
+        erc20Token.address,
+        lockAmount,
+        minValidEndTime,
+      ]);
+
+      const [, , , storedEndTime] = await erc20Locker.read.locks([0n]);
+      expect(storedEndTime).to.equal(minValidEndTime);
+
+      // Verify withdrawal works at expiry
+      await time.increaseTo(Number(minValidEndTime));
+
+      const initialBalance = await erc20Token.read.balanceOf([
+        addr1.account.address,
+      ]);
+      await erc20Locker.write.withdraw([0n], { account: addr1.account });
+      const finalBalance = await erc20Token.read.balanceOf([
+        addr1.account.address,
+      ]);
+
+      expect(finalBalance).to.equal(initialBalance + lockAmount);
+    });
+
     it('Should fail with insufficient allowance', async function () {
       const { erc20Locker, erc20Token, addr1 } = await loadFixture(
         deployERC20LockerFixture

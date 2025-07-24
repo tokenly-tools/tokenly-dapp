@@ -376,6 +376,67 @@ describe('ERC20Locker - Lock Management', function () {
         expect(error.message).to.include('InvalidOwner');
       }
     });
+
+    it('Should completely lock out old owner after ownership transfer', async function () {
+      const { erc20Locker, erc20Token, addr1, addr2 } = await loadFixture(
+        deployERC20LockerFixture
+      );
+
+      const lockAmount = parseEther('100');
+      const currentTime = await time.latest();
+      const endTime = BigInt(currentTime + 3600);
+
+      await erc20Locker.write.lock([
+        addr1.account.address,
+        erc20Token.address,
+        lockAmount,
+        endTime,
+      ]);
+
+      // Transfer ownership
+      await erc20Locker.write.transferLockOwnership(
+        [0n, addr2.account.address],
+        {
+          account: addr1.account,
+        }
+      );
+
+      const newEndTime = BigInt(currentTime + 7200);
+
+      // Old owner should be locked out of all operations
+      try {
+        await erc20Locker.write.extendLock([0n, newEndTime], {
+          account: addr1.account,
+        });
+        expect.fail('Expected transaction to revert');
+      } catch (error: any) {
+        expect(error.message).to.include('NotLockOwner');
+      }
+
+      try {
+        await erc20Locker.write.transferLockOwnership(
+          [0n, addr1.account.address],
+          {
+            account: addr1.account,
+          }
+        );
+        expect.fail('Expected transaction to revert');
+      } catch (error: any) {
+        expect(error.message).to.include('NotLockOwner');
+      }
+
+      await time.increaseTo(Number(endTime));
+
+      try {
+        await erc20Locker.write.withdraw([0n], { account: addr1.account });
+        expect.fail('Expected transaction to revert');
+      } catch (error: any) {
+        expect(error.message).to.include('NotLockOwner');
+      }
+
+      // Verify new owner still has access
+      await erc20Locker.write.withdraw([0n], { account: addr2.account });
+    });
   });
 
   describe('Lock Ownership Renunciation', function () {
@@ -477,6 +538,85 @@ describe('ERC20Locker - Lock Management', function () {
       } catch (error: any) {
         expect(error.message).to.include('NotLockOwner');
       }
+    });
+
+    it('Should reject ALL operations on renounced locks', async function () {
+      const { erc20Locker, erc20Token, addr1, addr2 } = await loadFixture(
+        deployERC20LockerFixture
+      );
+
+      const lockAmount = parseEther('100');
+      const currentTime = await time.latest();
+      const endTime = BigInt(currentTime + 3600);
+
+      await erc20Locker.write.lock([
+        addr1.account.address,
+        erc20Token.address,
+        lockAmount,
+        endTime,
+      ]);
+
+      // Renounce ownership
+      await erc20Locker.write.renounceLockOwnership([0n], {
+        account: addr1.account,
+      });
+
+      const newEndTime = BigInt(currentTime + 7200);
+
+      // All management operations should fail with zero address owner
+      try {
+        await erc20Locker.write.extendLock([0n, newEndTime], {
+          account: addr1.account,
+        });
+        expect.fail('Expected extendLock to revert');
+      } catch (error: any) {
+        expect(error.message).to.include('NotLockOwner');
+      }
+
+      try {
+        await erc20Locker.write.transferLockOwnership(
+          [0n, addr2.account.address],
+          {
+            account: addr1.account,
+          }
+        );
+        expect.fail('Expected transferLockOwnership to revert');
+      } catch (error: any) {
+        expect(error.message).to.include('NotLockOwner');
+      }
+
+      try {
+        await erc20Locker.write.renounceLockOwnership([0n], {
+          account: addr1.account,
+        });
+        expect.fail('Expected renounceLockOwnership to revert');
+      } catch (error: any) {
+        expect(error.message).to.include('NotLockOwner');
+      }
+
+      await time.increaseTo(Number(endTime));
+
+      try {
+        await erc20Locker.write.withdraw([0n], { account: addr1.account });
+        expect.fail('Expected withdraw to revert');
+      } catch (error: any) {
+        expect(error.message).to.include('NotLockOwner');
+      }
+
+      try {
+        await erc20Locker.write.withdrawUnsafe([0n], {
+          account: addr1.account,
+        });
+        expect.fail('Expected withdrawUnsafe to revert');
+      } catch (error: any) {
+        expect(error.message).to.include('NotLockOwner');
+      }
+
+      // Verify tokens are permanently locked (this is the intended behavior)
+      const contractBalance = await erc20Token.read.balanceOf([
+        erc20Locker.address,
+      ]);
+      expect(contractBalance).to.equal(lockAmount);
     });
 
     it('Should fail to renounce ownership by non-owner', async function () {

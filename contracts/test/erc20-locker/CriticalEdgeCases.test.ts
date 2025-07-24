@@ -92,19 +92,25 @@ describe('ERC20Locker - Critical Edge Cases', function () {
       const amounts = [parseEther('100'), 0n]; // One zero amount
       const endTimes = [endTime, endTime];
 
-      // This should succeed - individual zero amounts are allowed if total > 0
-      await erc20Locker.write.lockMultiple([
-        erc20Token.address,
-        owners,
-        amounts,
-        endTimes,
-      ]);
+      // FIXED: Contract now correctly rejects individual zero amounts
+      let errorThrown = false;
+      try {
+        await erc20Locker.write.lockMultiple([
+          erc20Token.address,
+          owners,
+          amounts,
+          endTimes,
+        ]);
+        expect.fail('Expected transaction to revert with InvalidAmount');
+      } catch (error: any) {
+        errorThrown = true;
+        expect(error.message).to.include('InvalidAmount');
+      }
 
-      expect(await erc20Locker.read.totalLocks()).to.equal(2n);
+      expect(errorThrown).to.be.true;
 
-      // Verify the zero-amount lock was created
-      const [, , storedAmount] = await erc20Locker.read.locks([1n]);
-      expect(storedAmount).to.equal(0n);
+      // Verify no locks were created due to the revert
+      expect(await erc20Locker.read.totalLocks()).to.equal(0n);
     });
   });
 
@@ -298,20 +304,20 @@ describe('ERC20Locker - Critical Edge Cases', function () {
       const amounts = [parseEther('100'), 0n]; // One zero amount
       const endTimes = [endTime, endTime];
 
-      // Current contract allows this but it shouldn't - creates meaningless locks
-      // This test documents the current behavior that should be changed
-      await erc20Locker.write.lockMultiple([
-        erc20Token.address,
-        owners,
-        amounts,
-        endTimes,
-      ]);
+      try {
+        await erc20Locker.write.lockMultiple([
+          erc20Token.address,
+          owners,
+          amounts,
+          endTimes,
+        ]);
+        expect.fail('Expected transaction to revert with InvalidAmount');
+      } catch (error: any) {
+        expect(error.message).to.include('InvalidAmount');
+      }
 
-      expect(await erc20Locker.read.totalLocks()).to.equal(2n);
-
-      // Verify the zero-amount lock was created (this is the problematic behavior)
-      const [, , storedAmount] = await erc20Locker.read.locks([1n]);
-      expect(storedAmount).to.equal(0n);
+      // Verify no locks were created due to the revert
+      expect(await erc20Locker.read.totalLocks()).to.equal(0n);
     });
   });
 
@@ -454,6 +460,57 @@ describe('ERC20Locker - Critical Edge Cases', function () {
       expect(owner1).to.equal('0x0000000000000000000000000000000000000000'); // Withdrawn
       expect(owner2).to.not.equal('0x0000000000000000000000000000000000000000');
       expect(owner3).to.not.equal('0x0000000000000000000000000000000000000000');
+    });
+
+    it('Should handle sequential lock ID assignment correctly', async function () {
+      const { erc20Locker, erc20Token, addr1 } = await loadFixture(
+        deployERC20LockerFixture
+      );
+
+      const lockAmount = parseEther('100');
+      const currentTime = await time.latest();
+      const endTime = BigInt(currentTime + 3600);
+
+      // Create multiple locks to test ID assignment
+      for (let i = 0; i < 5; i++) {
+        await erc20Locker.write.lock([
+          addr1.account.address,
+          erc20Token.address,
+          lockAmount,
+          endTime,
+        ]);
+
+        expect(await erc20Locker.read.totalLocks()).to.equal(BigInt(i + 1));
+      }
+
+      // Verify each lock has correct ID (sequential)
+      for (let i = 0; i < 5; i++) {
+        const [owner] = await erc20Locker.read.locks([BigInt(i)]);
+        expect(owner.toLowerCase()).to.equal(
+          addr1.account.address.toLowerCase()
+        );
+      }
+
+      // Withdraw some locks randomly
+      await time.increaseTo(Number(endTime));
+      await erc20Locker.write.withdraw([1n], { account: addr1.account });
+      await erc20Locker.write.withdraw([3n], { account: addr1.account });
+
+      // Create new locks - should continue from totalLocks
+      await erc20Locker.write.lock([
+        addr1.account.address,
+        erc20Token.address,
+        lockAmount,
+        BigInt(currentTime + 7200),
+      ]);
+
+      expect(await erc20Locker.read.totalLocks()).to.equal(6n);
+
+      // Verify the new lock got ID 5 (not reusing deleted IDs)
+      const [newOwner] = await erc20Locker.read.locks([5n]);
+      expect(newOwner.toLowerCase()).to.equal(
+        addr1.account.address.toLowerCase()
+      );
     });
   });
 });
