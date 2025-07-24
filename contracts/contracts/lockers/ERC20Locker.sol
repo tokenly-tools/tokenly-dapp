@@ -72,6 +72,7 @@ contract ERC20Locker is ReentrancyGuard {
     error NotLockOwner();
     error NotYetUnlocked();
     error MismatchedArrays();
+    error InexactTransfer();
 
     /**
      * @notice Locks a specified amount of an ERC20 token.
@@ -90,9 +91,9 @@ contract ERC20Locker is ReentrancyGuard {
         if (token == address(0)) revert InvalidTokenAddress();
         if (amount == 0) revert InvalidAmount();
 
-        lockId = _createLock(owner, IERC20(token), amount, endTime);
+        lockId = _createLock(owner, token, amount, endTime);
 
-        IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
+        _transferAndEnsureExactAmount(token, msg.sender, address(this), amount);
     }
 
     /**
@@ -123,10 +124,15 @@ contract ERC20Locker is ReentrancyGuard {
         if (totalAmount == 0) revert InvalidAmount();
 
         for (uint256 i = 0; i < owners.length; ++i) {
-            _createLock(owners[i], IERC20(token), amounts[i], endTimes[i]);
+            _createLock(owners[i], token, amounts[i], endTimes[i]);
         }
 
-        IERC20(token).safeTransferFrom(msg.sender, address(this), totalAmount);
+        _transferAndEnsureExactAmount(
+            token,
+            msg.sender,
+            address(this),
+            totalAmount
+        );
     }
 
     /**
@@ -136,18 +142,45 @@ contract ERC20Locker is ReentrancyGuard {
      * @param lockId The ID of the lock to withdraw from.
      */
     function withdraw(uint256 lockId) external nonReentrant {
+        _withdraw(lockId, true);
+    }
+
+    /**
+     * @notice Withdraws tokens from a lock without exact amount verification.
+     * @dev This function can only be called by the lock's owner after the end time has passed.
+     * Use this for fee-on-transfer tokens where exact amounts cannot be guaranteed.
+     * The lock is deleted upon successful withdrawal.
+     * @param lockId The ID of the lock to withdraw from.
+     */
+    function withdrawUnsafe(uint256 lockId) external nonReentrant {
+        _withdraw(lockId, false);
+    }
+
+    /**
+     * @notice Internal function to handle withdrawal logic.
+     * @param lockId The ID of the lock to withdraw from.
+     * @param useExactAmountCheck Whether to verify exact amount transfer.
+     */
+    function _withdraw(uint256 lockId, bool useExactAmountCheck) internal {
         Lock memory _lock = locks[lockId];
 
         if (msg.sender != _lock.owner) revert NotLockOwner();
         if (block.timestamp < _lock.endTime) revert NotYetUnlocked();
 
         uint256 amountToWithdraw = _lock.amount;
-        IERC20 token = IERC20(_lock.token);
         address owner = _lock.owner;
 
         delete locks[lockId];
 
-        token.safeTransfer(owner, amountToWithdraw);
+        if (useExactAmountCheck) {
+            _transferFromContractAndEnsureExactAmount(
+                _lock.token,
+                owner,
+                amountToWithdraw
+            );
+        } else {
+            IERC20(_lock.token).safeTransfer(owner, amountToWithdraw);
+        }
 
         emit Withdrawn(lockId, amountToWithdraw);
     }
@@ -195,16 +228,64 @@ contract ERC20Locker is ReentrancyGuard {
     }
 
     /**
+     * @notice Transfers tokens from sender and ensures exact amount is received.
+     * @param token The ERC20 token address.
+     * @param from The address to transfer from.
+     * @param to The address to transfer to.
+     * @param expectedAmount The expected amount to be transferred.
+     */
+    function _transferAndEnsureExactAmount(
+        address token,
+        address from,
+        address to,
+        uint256 expectedAmount
+    ) internal {
+        if (expectedAmount == 0) revert InvalidAmount();
+
+        IERC20 tokenContract = IERC20(token);
+        uint256 balanceBefore = tokenContract.balanceOf(to);
+        tokenContract.safeTransferFrom(from, to, expectedAmount);
+        uint256 balanceAfter = tokenContract.balanceOf(to);
+
+        uint256 actualAmount = balanceAfter - balanceBefore;
+
+        if (actualAmount != expectedAmount) revert InexactTransfer();
+    }
+
+    /**
+     * @notice Transfers tokens from contract and ensures exact amount is sent.
+     * @param token The ERC20 token address.
+     * @param to The address to transfer to.
+     * @param expectedAmount The expected amount to be transferred.
+     */
+    function _transferFromContractAndEnsureExactAmount(
+        address token,
+        address to,
+        uint256 expectedAmount
+    ) internal {
+        if (expectedAmount == 0) revert InvalidAmount();
+
+        IERC20 tokenContract = IERC20(token);
+        uint256 balanceBefore = tokenContract.balanceOf(to);
+        tokenContract.safeTransfer(to, expectedAmount);
+        uint256 balanceAfter = tokenContract.balanceOf(to);
+
+        uint256 actualAmount = balanceAfter - balanceBefore;
+
+        if (actualAmount != expectedAmount) revert InexactTransfer();
+    }
+
+    /**
      * @notice Creates a new lock and stores it.
      * @param owner The address that will have ownership of the lock.
-     * @param token The address of the ERC20 token to lock.
+     * @param token The ERC20 token address.
      * @param amount The amount of the token to lock.
      * @param endTime The timestamp after which the tokens can be withdrawn.
      * @return lockId The ID of the newly created lock.
      */
     function _createLock(
         address owner,
-        IERC20 token,
+        address token,
         uint256 amount,
         uint256 endTime
     ) internal returns (uint256 lockId) {
@@ -214,12 +295,12 @@ contract ERC20Locker is ReentrancyGuard {
         lockId = totalLocks;
         locks[lockId] = Lock({
             owner: owner,
-            token: address(token),
+            token: token,
             amount: amount,
             endTime: endTime
         });
 
         ++totalLocks;
-        emit Locked(lockId, owner, address(token), amount, endTime);
+        emit Locked(lockId, owner, token, amount, endTime);
     }
 }
