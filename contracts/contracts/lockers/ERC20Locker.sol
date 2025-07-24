@@ -157,35 +157,6 @@ contract ERC20Locker is ReentrancyGuard {
     }
 
     /**
-     * @notice Internal function to handle withdrawal logic.
-     * @param lockId The ID of the lock to withdraw from.
-     * @param useExactAmountCheck Whether to verify exact amount transfer.
-     */
-    function _withdraw(uint256 lockId, bool useExactAmountCheck) internal {
-        Lock memory _lock = locks[lockId];
-
-        if (msg.sender != _lock.owner) revert NotLockOwner();
-        if (block.timestamp < _lock.endTime) revert NotYetUnlocked();
-
-        uint256 amountToWithdraw = _lock.amount;
-        address owner = _lock.owner;
-
-        delete locks[lockId];
-
-        if (useExactAmountCheck) {
-            _transferFromContractAndEnsureExactAmount(
-                _lock.token,
-                owner,
-                amountToWithdraw
-            );
-        } else {
-            IERC20(_lock.token).safeTransfer(owner, amountToWithdraw);
-        }
-
-        emit Withdrawn(lockId, amountToWithdraw);
-    }
-
-    /**
      * @notice Extends the end time of a lock.
      * @param lockId The ID of the lock to extend.
      * @param newEndTime The new end time, which must be later than the current end time.
@@ -225,6 +196,35 @@ contract ERC20Locker is ReentrancyGuard {
 
         locks[lockId].owner = address(0);
         emit LockOwnershipTransferred(lockId, address(0));
+    }
+
+    /**
+     * @notice Internal function to handle withdrawal logic.
+     * @param lockId The ID of the lock to withdraw from.
+     * @param useExactAmountCheck Whether to verify exact amount transfer.
+     */
+    function _withdraw(uint256 lockId, bool useExactAmountCheck) internal {
+        Lock memory _lock = locks[lockId];
+
+        if (msg.sender != _lock.owner) revert NotLockOwner();
+        if (block.timestamp < _lock.endTime) revert NotYetUnlocked();
+
+        uint256 amountToWithdraw = _lock.amount;
+        address owner = _lock.owner;
+
+        delete locks[lockId];
+
+        if (useExactAmountCheck) {
+            _transferFromContractAndEnsureExactAmount(
+                _lock.token,
+                owner,
+                amountToWithdraw
+            );
+        } else {
+            IERC20(_lock.token).safeTransfer(owner, amountToWithdraw);
+        }
+
+        emit Withdrawn(lockId, amountToWithdraw);
     }
 
     /**
