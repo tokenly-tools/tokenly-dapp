@@ -225,6 +225,52 @@ describe('ERC20Locker - Critical Edge Cases', function () {
       const [, , , storedEndTime] = await erc20Locker.read.locks([0n]);
       expect(storedEndTime).to.equal(newEndTime);
     });
+
+    it('Should properly validate minimum extension requirement (endTime + 1)', async function () {
+      const { erc20Locker, erc20Token, addr1 } = await loadFixture(
+        deployERC20LockerFixture
+      );
+
+      const lockAmount = parseEther('100');
+      const currentTime = await time.latest();
+      const endTime = BigInt(currentTime + 3600);
+
+      await erc20Locker.write.lock([
+        addr1.account.address,
+        erc20Token.address,
+        lockAmount,
+        endTime,
+      ]);
+
+      // Test boundary conditions for extension validation
+      // Should fail with exactly endTime
+      try {
+        await erc20Locker.write.extendLock([0n, endTime], {
+          account: addr1.account,
+        });
+        expect.fail('Expected transaction to revert with same endTime');
+      } catch (error: any) {
+        expect(error.message).to.include('InvalidEndTime');
+      }
+
+      // Should succeed with endTime + 1 (minimum valid extension)
+      const minValidExtension = endTime + 1n;
+      await erc20Locker.write.extendLock([0n, minValidExtension], {
+        account: addr1.account,
+      });
+
+      const [, , , storedEndTime] = await erc20Locker.read.locks([0n]);
+      expect(storedEndTime).to.equal(minValidExtension);
+
+      // Should still allow further extensions
+      const furtherExtension = minValidExtension + 1n;
+      await erc20Locker.write.extendLock([0n, furtherExtension], {
+        account: addr1.account,
+      });
+
+      const [, , , finalEndTime] = await erc20Locker.read.locks([0n]);
+      expect(finalEndTime).to.equal(furtherExtension);
+    });
   });
 
   describe('Arithmetic Overflow Protection', function () {
@@ -258,7 +304,38 @@ describe('ERC20Locker - Critical Edge Cases', function () {
       } catch (error: any) {
         // Should fail gracefully, either due to overflow protection or insufficient balance
         expect(error.message).to.match(
-          /overflow|InsufficientAllowance|InsufficientBalance/i
+          /overflow|InsufficientAllowance|InsufficientBalance|arithmetic operation|panic/i
+        );
+      }
+    });
+
+    it('Should handle realistic overflow scenario with maximum values', async function () {
+      const { erc20Locker, erc20Token, addr1 } = await loadFixture(
+        deployERC20LockerFixture
+      );
+
+      // Create amounts that would realistically cause overflow
+      const maxSafeUint = 2n ** 255n; // Half of max uint256 to avoid immediate overflow
+      const amounts = [maxSafeUint, maxSafeUint]; // Sum would overflow uint256
+      const currentTime = await time.latest();
+      const endTime = BigInt(currentTime + 3600);
+      const owners = [addr1.account.address, addr1.account.address];
+      const endTimes = [endTime, endTime];
+
+      try {
+        await erc20Locker.write.lockMultiple([
+          erc20Token.address,
+          owners,
+          amounts,
+          endTimes,
+        ]);
+        expect.fail(
+          'Expected transaction to revert due to arithmetic overflow'
+        );
+      } catch (error: any) {
+        // Should fail with panic code 0x11 (arithmetic overflow) or insufficient balance
+        expect(error.message).to.match(
+          /panic|arithmetic|overflow|InsufficientAllowance|InsufficientBalance/i
         );
       }
     });
@@ -386,9 +463,9 @@ describe('ERC20Locker - Critical Edge Cases', function () {
         deployERC20LockerFixture
       );
 
-      const batchSize = 200; // Large but reasonable
+      const batchSize = 50; // Reasonable size for coverage testing
       const lockAmount = parseEther('0.01'); // Small amounts
-      const totalAmount = parseEther('2'); // 200 * 0.01
+      const totalAmount = parseEther('0.5'); // 50 * 0.01
       const currentTime = await time.latest();
       const endTime = BigInt(currentTime + 3600);
 

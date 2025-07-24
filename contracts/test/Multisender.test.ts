@@ -15,12 +15,14 @@ describe('Multisender', function () {
       owner.account.address,
       parseEther('1000'),
     ]);
+    const ethRejecter = await hre.viem.deployContract('EthRejecter');
 
     const publicClient = await hre.viem.getPublicClient();
 
     return {
       multisender,
       erc20Token,
+      ethRejecter,
       owner,
       recipient1,
       recipient2,
@@ -126,6 +128,22 @@ describe('Multisender', function () {
         expect.fail('Expected transaction to revert');
       } catch (error: any) {
         expect(error.message).to.include('IncorrectTotalAmountSent');
+      }
+    });
+
+    it('should revert if ETH transfer fails (contract rejects ETH)', async function () {
+      const { multisender, ethRejecter } = await loadFixture(deployContracts);
+      const amounts = [parseEther('1')];
+      const totalAmount = amounts[0];
+
+      try {
+        await multisender.write.multisendNative(
+          [[ethRejecter.address], amounts],
+          { value: totalAmount }
+        );
+        expect.fail('Expected transaction to revert');
+      } catch (error: any) {
+        expect(error.message).to.include('FailedToSendETH');
       }
     });
   });
