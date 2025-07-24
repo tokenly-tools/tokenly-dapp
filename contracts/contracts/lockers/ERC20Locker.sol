@@ -118,6 +118,7 @@ contract ERC20Locker is ReentrancyGuard {
 
         uint256 totalAmount = 0;
         for (uint256 i = 0; i < amounts.length; ++i) {
+            if (amounts[i] == 0) revert InvalidAmount();
             totalAmount += amounts[i];
         }
 
