@@ -1,16 +1,10 @@
 {
   "plugins": ["prettier-plugin-solidity"],
-  "semi": true,
-  "trailingComma": "es5",
+  "semi": false,
   "singleQuote": true,
-  "printWidth": 80,
-  "tabWidth": 2,
-  "useTabs": false,
-  "bracketSpacing": true,
-  "bracketSameLine": false,
+  "trailingComma": "none",
   "arrowParens": "avoid",
-  "endOfLine": "lf",
-  "vueIndentScriptAndStyle": false,
+  "printWidth": 120,
   "overrides": [
     {
       "files": "*.sol",
