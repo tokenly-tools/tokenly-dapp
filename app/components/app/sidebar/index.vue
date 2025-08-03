@@ -3,7 +3,7 @@
     <SidebarHeader>
       <SidebarMenu>
         <SidebarMenuItem>
-          <AppLogo class="justify-center px-2 py-4" />
+          <AppLogo class="hidden justify-center px-2 py-4 md:flex" />
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarHeader>
@@ -11,36 +11,28 @@
       <SidebarGroup>
         <SidebarMenu>
           <SidebarMenuItem v-for="item in data.navMain" :key="item.title">
-            <div class="p-2 select-none font-semibold text-sidebar-foreground">
+            <div class="text-sidebar-foreground select-none p-2 font-semibold">
               {{ item.title }}
             </div>
             <SidebarMenuSub v-if="item.items.length">
-              <SidebarMenuSubItem
-                v-for="childItem in item.items"
-                :key="childItem.title"
-              >
+              <SidebarMenuSubItem v-for="childItem in item.items" :key="childItem.title">
                 <SidebarMenuSubButton
                   as-child
                   :disabled="childItem.isDisabled"
                   :class="{
-                    'opacity-50 cursor-not-allowed': childItem.isDisabled,
+                    'cursor-not-allowed opacity-50': childItem.isDisabled
                   }"
                 >
-                  <a
-                    :href="childItem.url"
+                  <NuxtLink
+                    :to="childItem.to"
                     :class="{ 'pointer-events-none': childItem.isDisabled }"
-                    class="flex items-center px-3 py-6 rounded-md"
+                    class="flex items-center rounded-md px-3 py-6"
                   >
-                    <div
-                      class="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0"
-                    >
-                      <component
-                        :is="childItem.icon"
-                        class="w-4 h-4 text-sidebar-primary"
-                      />
+                    <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md">
+                      <component :is="childItem.icon" class="text-sidebar-primary h-4 w-4" />
                     </div>
                     <span>{{ childItem.title }}</span>
-                  </a>
+                  </NuxtLink>
                 </SidebarMenuSubButton>
               </SidebarMenuSubItem>
             </SidebarMenuSub>
@@ -64,8 +56,8 @@ import {
   PiggyBank,
   Vault,
   Palette,
-  Package,
-} from 'lucide-vue-next';
+  Package
+} from 'lucide-vue-next'
 
 import {
   Sidebar,
@@ -77,13 +69,13 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarRail,
-} from '@/components/ui/sidebar';
+  SidebarRail
+} from '@/components/ui/sidebar'
 
 const props = defineProps<{
-  className?: string;
-  [key: string]: any;
-}>();
+  className?: string
+  [key: string]: any
+}>()
 
 // Navigation data for Tokenly DApp
 const data = {
@@ -94,16 +86,16 @@ const data = {
       items: [
         {
           title: 'Token minter',
-          url: '#',
-          icon: Coins,
+          to: '/mint/token',
+          icon: Coins
         },
         {
           title: 'NFT minter (coming soon)',
-          url: '#',
+          to: '#',
           isDisabled: true,
-          icon: Palette,
-        },
-      ],
+          icon: Palette
+        }
+      ]
     },
     {
       title: 'Distribution & Engagement',
@@ -111,27 +103,28 @@ const data = {
       items: [
         {
           title: 'Airdrop',
-          url: '#',
-          icon: Gift,
+          to: '#',
+          icon: Gift
         },
         {
           title: 'Multisender',
           url: '#',
-          icon: Send,
+          icon: Send
         },
         {
-          title: 'Launchpad',
-          url: '#',
+          title: 'Launchpad (coming soon)',
+          to: '#',
           icon: Rocket,
-          badge: true,
+          isDisabled: true,
+          badge: true
         },
         {
           title: 'Staking (coming soon)',
-          url: '#',
+          to: '#',
           isDisabled: true,
-          icon: PiggyBank,
-        },
-      ],
+          icon: PiggyBank
+        }
+      ]
     },
     {
       title: 'Asset Management',
@@ -139,11 +132,11 @@ const data = {
       items: [
         {
           title: 'Locker',
-          url: '#',
-          icon: Lock,
-        },
-      ],
-    },
-  ],
-};
+          to: '#',
+          icon: Lock
+        }
+      ]
+    }
+  ]
+}
 </script>

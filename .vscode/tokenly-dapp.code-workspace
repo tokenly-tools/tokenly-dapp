@@ -1,10 +1,32 @@
 {
 	"folders": [
 		{
-			"path": "../"
+			"path": "../",
+			"name": "root",
+			"ignore": [
+				"../app",
+				"../contracts"
+			]
+		},
+		{
+			"path": "../app",
+			"name": "FE"
+		},
+		{
+			"path": "../contracts",
+			"name": "BE"
 		}
 	],
 	"settings": {
-		"prettier.configPath": ".prettierrc"
+		"prettier.configPath": "../.prettierrc",
+		"editor.formatOnSave": true,
+		"scss.lint.unknownAtRules": "ignore"
+	},
+	"extensions": {
+		"recommendations": [
+			"esbenp.prettier-vscode",
+			"vue.volar",
+			"bradlc.vscode-tailwindcss"
+		]
 	}
 }
