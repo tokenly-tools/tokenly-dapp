@@ -3,6 +3,11 @@ packages:
   - contracts
 
 onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
   - esbuild
+  - keccak
+  - secp256k1
   - sharp
+  - unrs-resolver
+  - vue-demi
   - workerd
