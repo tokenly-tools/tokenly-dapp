@@ -121,7 +121,12 @@
     @apply bg-background text-foreground;
   }
 }
+
 header,
 footer {
   padding: 1rem;
+}
+
+form {
+  @apply rounded-2xl bg-orange-100 p-6;
 }

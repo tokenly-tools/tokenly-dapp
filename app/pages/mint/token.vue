@@ -1,19 +1,7 @@
 <template>
-  <div class="mx-auto max-w-2xl">
+  <div class="mx-auto mt-4 max-w-2xl md:mt-0">
     <h1 class="mb-6 text-2xl font-bold">Mint New Token</h1>
-    
-    <!-- Wallet Connection Status -->
-    <div v-if="!isConnected" class="mb-6 rounded-2xl bg-red-100 p-4 text-red-800">
-      <p class="font-medium">⚠️ Wallet not connected</p>
-      <p class="text-sm">Please connect your wallet to mint tokens.</p>
-    </div>
-    
-    <div v-else class="mb-6 rounded-2xl bg-green-100 p-4 text-green-800">
-      <p class="font-medium">✅ Wallet connected</p>
-      <p class="text-sm">{{ connectedAddress }}</p>
-    </div>
-
-    <div class="rounded-2xl bg-orange-100 p-6">
+    <div>
       <form @submit="onSubmit">
         <div class="space-y-4">
           <FormField v-slot="{ componentField }" name="tokenName">
@@ -65,16 +53,8 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input'
 
 // Use the mint token hook
-const {
-  mintToken,
-  isMinting,
-  isSuccess,
-  hasError,
-  getErrorMessage,
-  transactionHash,
-  connectedAddress,
-  isConnected
-} = useMintToken()
+const { mintToken, isMinting, isSuccess, hasError, getErrorMessage, transactionHash, connectedAddress, isConnected } =
+  useMintToken()
 
 const isBtnDisabled = computed(() => {
   return isMinting.value || !form.meta.value.valid || !form.meta.value.dirty || !isConnected.value
@@ -141,7 +121,7 @@ const onSubmit = form.handleSubmit(async values => {
 })
 
 // Watch for successful transaction confirmation
-watch(isSuccess, (newSuccess) => {
+watch(isSuccess, newSuccess => {
   if (newSuccess && transactionHash.value) {
     alert(`Token minted successfully! Transaction: ${transactionHash.value}`)
     form.resetForm() // Reset the form after successful mint
@@ -149,7 +129,7 @@ watch(isSuccess, (newSuccess) => {
 })
 
 // Watch for errors
-watch(hasError, (newHasError) => {
+watch(hasError, newHasError => {
   if (newHasError) {
     const errorMessage = getErrorMessage()
     if (errorMessage) {
