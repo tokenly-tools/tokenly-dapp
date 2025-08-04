@@ -1,33 +1,28 @@
-import hre from 'hardhat';
+import hre from 'hardhat'
 
 async function main() {
-  const [deployer] = await hre.viem.getWalletClients();
-  const publicClient = await hre.viem.getPublicClient();
+  const [deployer] = await hre.viem.getWalletClients()
+  const publicClient = await hre.viem.getPublicClient()
 
-  console.log(
-    'Deploying contracts with the account:',
-    deployer.account.address
-  );
+  console.log('Deploying contracts with the account:', deployer.account.address)
 
   const balance = await publicClient.getBalance({
-    address: deployer.account.address,
-  });
+    address: deployer.account.address
+  })
 
-  console.log('Account balance:', balance.toString());
+  console.log('Account balance:', balance.toString())
 
-  // Deploy your contract here
-  // Example:
-  // const contract = await hre.viem.deployContract("YourContract", [
-  //   constructorArg1,
-  //   constructorArg2,
-  // ]);
+  // Deploy ERC20TokenFactory
+  console.log('Deploying ERC20TokenFactory...')
 
-  // console.log("Contract deployed to:", contract.address);
+  const erc20TokenFactory = await hre.viem.deployContract('ERC20TokenFactory', [])
 
-  console.log('Deployment completed!');
+  console.log('ERC20TokenFactory deployed to:', erc20TokenFactory.address)
+
+  console.log('Deployment completed!')
 }
 
 main().catch(error => {
-  console.error(error);
-  process.exitCode = 1;
-});
+  console.error(error)
+  process.exitCode = 1
+})
