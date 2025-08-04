@@ -1,6 +1,18 @@
 <template>
   <div class="mx-auto max-w-2xl">
     <h1 class="mb-6 text-2xl font-bold">Mint New Token</h1>
+    
+    <!-- Wallet Connection Status -->
+    <div v-if="!isConnected" class="mb-6 rounded-2xl bg-red-100 p-4 text-red-800">
+      <p class="font-medium">⚠️ Wallet not connected</p>
+      <p class="text-sm">Please connect your wallet to mint tokens.</p>
+    </div>
+    
+    <div v-else class="mb-6 rounded-2xl bg-green-100 p-4 text-green-800">
+      <p class="font-medium">✅ Wallet connected</p>
+      <p class="text-sm">{{ connectedAddress }}</p>
+    </div>
+
     <div class="rounded-2xl bg-orange-100 p-6">
       <form @submit="onSubmit">
         <div class="space-y-4">
@@ -35,7 +47,7 @@
           </FormField>
 
           <Button type="submit" class="w-full" :disabled="isBtnDisabled">
-            {{ isSubmitting ? 'Minting...' : 'Mint Token' }}
+            {{ isMinting ? 'Minting...' : 'Mint Token' }}
           </Button>
         </div>
       </form>
@@ -52,10 +64,20 @@ import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 
-const isSubmitting = ref(false)
+// Use the mint token hook
+const {
+  mintToken,
+  isMinting,
+  isSuccess,
+  hasError,
+  getErrorMessage,
+  transactionHash,
+  connectedAddress,
+  isConnected
+} = useMintToken()
 
 const isBtnDisabled = computed(() => {
-  return isSubmitting.value || !form.meta.value.valid || !form.meta.value.dirty
+  return isMinting.value || !form.meta.value.valid || !form.meta.value.dirty || !isConnected.value
 })
 
 const formSchema = toTypedSchema(
@@ -89,18 +111,50 @@ const form = useForm({
 })
 
 const onSubmit = form.handleSubmit(async values => {
-  isSubmitting.value = true
-
   try {
-    console.log('Form submitted with values:', values)
-    await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate API call
+    // Check wallet connection
+    if (!isConnected.value) {
+      alert('Please connect your wallet first')
+      return
+    }
 
-    alert('Token minted successfully!')
+    console.log('Form submitted with values:', values)
+    console.log('Connected wallet:', connectedAddress.value)
+
+    // Call the mint token function
+    const result = await mintToken({
+      tokenName: values.tokenName,
+      tokenSymbol: values.tokenSymbol,
+      totalSupply: values.totalSupply
+    })
+
+    if (result.error) {
+      alert(`Failed to mint token: ${result.error}`)
+    } else {
+      console.log('Transaction hash:', result.transactionHash)
+      // Don't show success immediately - wait for transaction confirmation
+    }
   } catch (error) {
     console.error('Error minting token:', error)
     alert('Failed to mint token. Please try again.')
-  } finally {
-    isSubmitting.value = false
+  }
+})
+
+// Watch for successful transaction confirmation
+watch(isSuccess, (newSuccess) => {
+  if (newSuccess && transactionHash.value) {
+    alert(`Token minted successfully! Transaction: ${transactionHash.value}`)
+    form.resetForm() // Reset the form after successful mint
+  }
+})
+
+// Watch for errors
+watch(hasError, (newHasError) => {
+  if (newHasError) {
+    const errorMessage = getErrorMessage()
+    if (errorMessage) {
+      alert(`Error: ${errorMessage}`)
+    }
   }
 })
 </script>
