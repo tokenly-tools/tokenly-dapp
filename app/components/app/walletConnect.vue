@@ -8,28 +8,25 @@
       </Button>
     </div>
     <template #fallback>
-      <Button disabled>Loading...</Button>
+      <div class="flex justify-end">
+        <Button disabled>Loading...</Button>
+      </div>
     </template>
   </ClientOnly>
 </template>
 <script setup lang="ts">
 import { Wallet } from 'lucide-vue-next'
-import { useAppKit, useAppKitAccount } from '@reown/appkit/vue'
 
-// Only initialize AppKit on client side
-const appKit = import.meta.client ? useAppKit() : null
-const accountData = import.meta.client ? useAppKitAccount() : ref(null)
+const { appKit, account, isConnected } = useWagmiClient()
 
-// @ts-ignore
-function open(options) {
+function open(options?: any) {
   if (appKit) {
     return options ? appKit.open(options) : appKit.open()
   }
 }
 
-const isConnected = computed(() => accountData.value?.isConnected ?? false)
 const trimmedAddress = computed(() => {
-  if (!accountData.value?.address) return ''
-  return `${accountData.value.address.slice(0, 6)}...${accountData.value.address.slice(-4)}`
+  if (!account.address.value) return ''
+  return `${account.address.value.slice(0, 6)}...${account.address.value.slice(-4)}`
 })
 </script>

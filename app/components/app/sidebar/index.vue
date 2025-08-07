@@ -3,8 +3,8 @@
     <SidebarHeader>
       <SidebarMenu>
         <SidebarMenuItem>
-          <div class="flex h-14 w-full items-center justify-center p-2">
-            <AppLogo class="hidden h-full w-full md:flex" />
+          <div class="hidden h-14 w-full items-center justify-center p-2 md:flex">
+            <AppLogo class="h-full w-full" />
           </div>
         </SidebarMenuItem>
       </SidebarMenu>
@@ -18,14 +18,19 @@
             </div>
             <SidebarMenuSub v-if="item.items.length">
               <SidebarMenuSubItem v-for="childItem in item.items" :key="childItem.title">
-                <Tooltip v-if="childItem.isDisabled" :open="isMobile ? activeTooltip === childItem.title : undefined">
+                <Tooltip
+                  v-if="childItem.isDisabled"
+                  :open="isMobile ? activeTooltip === childItem.title : undefined"
+                >
                   <TooltipTrigger as-child>
                     <AppSidebarMenuItem
                       :title="childItem.title"
                       :to="childItem.to"
                       :icon="childItem.icon"
                       :is-disabled="childItem.isDisabled"
-                      @click="isMobile ? toggleTooltip(childItem.title, $event) : undefined"
+                      @click="
+                        isMobile ? toggleTooltip(childItem.title, $event) : undefined
+                      "
                     />
                   </TooltipTrigger>
                   <TooltipContent side="right" :side-offset="-10">
