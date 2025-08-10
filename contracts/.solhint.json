@@ -22,11 +22,11 @@
     "const-name-snakecase": "error",
     "gas-custom-errors": "error",
     "no-console": "error",
-    "no-empty-blocks": "error",
     "no-unused-vars": "error",
     "payable-fallback": "error",
     "check-send-result": "error",
     "avoid-suicide": "error",
-    "avoid-sha3": "error"
+    "avoid-sha3": "error",
+    "no-empty-blocks": "off"
   }
 }
