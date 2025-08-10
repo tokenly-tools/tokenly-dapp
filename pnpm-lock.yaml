@@ -175,9 +175,6 @@ importers:
       chai:
         specifier: ^4.3.10
         version: 4.5.0
-      dotenv:
-        specifier: ^16.4.7
-        version: 16.6.1
       hardhat:
         specifier: ^2.22.18
         version: 2.25.0(bufferutil@4.0.9)(ts-node@10.9.2(@types/node@22.16.3)(typescript@5.8.3))(typescript@5.8.3)(utf-8-validate@5.0.10)
