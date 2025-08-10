@@ -14,27 +14,6 @@ async function main() {
   console.log('Deploying LockerReader bound to locker...')
   const lockerReader = await hre.viem.deployContract('LockerReader', [erc20Locker.address])
   console.log('LockerReader deployed to:', lockerReader.address)
-
-  // Verify (if API configured and on a supported network)
-  try {
-    console.log('Verifying ERC20Locker...')
-    await hre.run('verify:verify', {
-      address: erc20Locker.address,
-      constructorArguments: []
-    })
-  } catch (e) {
-    console.warn('Verification (ERC20Locker) skipped/failed:', (e as Error).message)
-  }
-
-  try {
-    console.log('Verifying LockerReader...')
-    await hre.run('verify:verify', {
-      address: lockerReader.address,
-      constructorArguments: [erc20Locker.address]
-    })
-  } catch (e) {
-    console.warn('Verification (LockerReader) skipped/failed:', (e as Error).message)
-  }
 }
 
 main().catch(err => {

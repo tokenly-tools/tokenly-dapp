@@ -1,7 +1,6 @@
 import type { HardhatUserConfig } from 'hardhat/config'
 import { vars } from 'hardhat/config'
 import '@nomicfoundation/hardhat-toolbox-viem'
-import '@nomicfoundation/hardhat-verify'
 import 'hardhat-contract-sizer'
 import 'solidity-coverage'
 
@@ -30,21 +29,6 @@ const config: HardhatUserConfig = {
       chainId: 1114
     }
   },
-  etherscan: {
-    // New v2 config: single Etherscan API key from env
-    apiKey: process.env.ETHERSCAN_API_KEY || '',
-    // Custom chain (Etherscan-compatible explorer)
-    customChains: [
-      {
-        network: 'coreTestnet2',
-        chainId: 1114,
-        urls: {
-          apiURL: 'https://scan.test2.btcs.network/api',
-          browserURL: 'https://scan.test2.btcs.network'
-        }
-      }
-    ]
-  },
   contractSizer: {
     alphaSort: true,
     disambiguatePaths: false,
@@ -54,6 +38,9 @@ const config: HardhatUserConfig = {
   },
   mocha: {
     timeout: 40000
+  },
+  sourcify: {
+    enabled: true
   }
 }
 

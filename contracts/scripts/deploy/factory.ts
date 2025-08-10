@@ -10,16 +10,6 @@ async function main() {
 
   const erc20TokenFactory = await hre.viem.deployContract('ERC20TokenFactory', [])
   console.log('ERC20TokenFactory deployed to:', erc20TokenFactory.address)
-
-  try {
-    console.log('Verifying ERC20TokenFactory...')
-    await hre.run('verify:verify', {
-      address: erc20TokenFactory.address,
-      constructorArguments: []
-    })
-  } catch (e) {
-    console.warn('Verification (ERC20TokenFactory) skipped/failed:', (e as Error).message)
-  }
 }
 
 main().catch(err => {

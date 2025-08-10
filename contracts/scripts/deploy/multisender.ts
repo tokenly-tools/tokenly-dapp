@@ -10,16 +10,6 @@ async function main() {
 
   const multisender = await hre.viem.deployContract('Multisender')
   console.log('Multisender deployed to:', multisender.address)
-
-  try {
-    console.log('Verifying Multisender...')
-    await hre.run('verify:verify', {
-      address: multisender.address,
-      constructorArguments: []
-    })
-  } catch (e) {
-    console.warn('Verification (Multisender) skipped/failed:', (e as Error).message)
-  }
 }
 
 main().catch(err => {
