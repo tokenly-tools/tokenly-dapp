@@ -24,7 +24,7 @@ const config: HardhatUserConfig = {
       chainId: 31337
     },
     coreTestnet2: {
-      url: process.env.CORE_TESTNET2_URL || 'https://rpc.test2.btcs.network',
+      url: 'https://rpc.test2.btcs.network',
       accounts: vars.has('PRIVATE_KEY') ? [vars.get('PRIVATE_KEY')] : [],
       chainId: 1114
     }
