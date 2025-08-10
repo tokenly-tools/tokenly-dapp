@@ -1,0 +1,65 @@
+{
+  "network": "coreTestnet2",
+  "chainId": 1114,
+  "updatedAt": "2025-08-10T11:26:17.411Z",
+  "deployments": {
+    "ERC20TokenFactory": {
+      "latest": "0xa570d6a7310b1d62848a7c64a33d65b208199ebe",
+      "history": [
+        {
+          "contract": "ERC20TokenFactory",
+          "address": "0xa570d6a7310b1d62848a7c64a33d65b208199ebe",
+          "network": "coreTestnet2",
+          "chainId": 1114,
+          "deployer": "0x0646610bb00ab2b69d625480bae7d32a4a67a5ba",
+          "blockNumber": 7207398,
+          "args": [],
+          "timestamp": "2025-08-10T11:25:59.552Z"
+        }
+      ]
+    },
+    "ERC20Locker": {
+      "latest": "0x7ac31847515d1ab91917efc69253e5f73603d198",
+      "history": [
+        {
+          "contract": "ERC20Locker",
+          "address": "0x7ac31847515d1ab91917efc69253e5f73603d198",
+          "network": "coreTestnet2",
+          "chainId": 1114,
+          "deployer": "0x0646610bb00ab2b69d625480bae7d32a4a67a5ba",
+          "blockNumber": 7207400,
+          "timestamp": "2025-08-10T11:26:05.383Z"
+        }
+      ]
+    },
+    "LockerReader": {
+      "latest": "0x5488a484a0e85ed7d0896b33e947b2a03782dd51",
+      "history": [
+        {
+          "contract": "LockerReader",
+          "address": "0x5488a484a0e85ed7d0896b33e947b2a03782dd51",
+          "network": "coreTestnet2",
+          "chainId": 1114,
+          "deployer": "0x0646610bb00ab2b69d625480bae7d32a4a67a5ba",
+          "blockNumber": 7207402,
+          "args": ["0x7ac31847515d1ab91917efc69253e5f73603d198"],
+          "timestamp": "2025-08-10T11:26:11.458Z"
+        }
+      ]
+    },
+    "Multisender": {
+      "latest": "0xea9fbccae1e3953b109958b3b1d6988e4a23c21b",
+      "history": [
+        {
+          "contract": "Multisender",
+          "address": "0xea9fbccae1e3953b109958b3b1d6988e4a23c21b",
+          "network": "coreTestnet2",
+          "chainId": 1114,
+          "deployer": "0x0646610bb00ab2b69d625480bae7d32a4a67a5ba",
+          "blockNumber": 7207404,
+          "timestamp": "2025-08-10T11:26:17.411Z"
+        }
+      ]
+    }
+  }
+}

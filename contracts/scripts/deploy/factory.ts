@@ -1,4 +1,5 @@
 import hre from 'hardhat'
+import { recordDeployment } from '../utils/deploymentRegistry'
 
 async function main() {
   const [deployer] = await hre.viem.getWalletClients()
@@ -10,6 +11,11 @@ async function main() {
 
   const erc20TokenFactory = await hre.viem.deployContract('ERC20TokenFactory', [])
   console.log('ERC20TokenFactory deployed to:', erc20TokenFactory.address)
+  await recordDeployment(hre, {
+    contract: 'ERC20TokenFactory',
+    address: erc20TokenFactory.address,
+    args: []
+  })
 }
 
 main().catch(err => {

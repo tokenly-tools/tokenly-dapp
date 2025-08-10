@@ -1,4 +1,5 @@
 import hre from 'hardhat'
+import { recordDeployment } from '../utils/deploymentRegistry'
 
 async function main() {
   const [deployer] = await hre.viem.getWalletClients()
@@ -10,6 +11,10 @@ async function main() {
 
   const multisender = await hre.viem.deployContract('Multisender')
   console.log('Multisender deployed to:', multisender.address)
+  await recordDeployment(hre, {
+    contract: 'Multisender',
+    address: multisender.address
+  })
 }
 
 main().catch(err => {
