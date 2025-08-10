@@ -8,11 +8,11 @@
     "test": "hardhat test",
     "test:coverage": "SOLIDITY_COVERAGE=true hardhat coverage",
     "deploy:factory:local": "hardhat run scripts/deploy/factory.ts --network localhost",
-    "deploy:factory:core-testnet2": "hardhat run scripts/deploy/factory.ts --network coreTestnet2",
+    "deploy:factory:core-t2": "hardhat run scripts/deploy/factory.ts --network coreTestnet2",
     "deploy:locker:local": "hardhat run scripts/deploy/locker.ts --network localhost",
-    "deploy:locker:core-testnet2": "hardhat run scripts/deploy/locker.ts --network coreTestnet2",
+    "deploy:locker:core-t2": "hardhat run scripts/deploy/locker.ts --network coreTestnet2",
     "deploy:multisender:local": "hardhat run scripts/deploy/multisender.ts --network localhost",
-    "deploy:multisender:core-testnet2": "hardhat run scripts/deploy/multisender.ts --network coreTestnet2",
+    "deploy:multisender:core-t2": "hardhat run scripts/deploy/multisender.ts --network coreTestnet2",
     "node": "hardhat node",
     "clean": "hardhat clean",
     "size": "hardhat size-contracts",
@@ -27,9 +27,12 @@
   "keywords": [
     "hardhat",
     "ethereum",
+    "core",
     "smart-contracts",
     "solidity",
-    "defi"
+    "multisender",
+    "locker",
+    "token-factory"
   ],
   "author": "",
   "license": "MIT",
