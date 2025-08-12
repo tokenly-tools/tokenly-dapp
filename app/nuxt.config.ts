@@ -1,4 +1,8 @@
 import tailwindcss from '@tailwindcss/vite'
+import { fileURLToPath } from 'node:url'
+import { dirname, resolve as resolvePath } from 'node:path'
+
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -14,6 +18,13 @@ export default defineNuxtConfig({
     cloudflare: {
       deployConfig: true,
       nodeCompat: true
+    },
+    moduleSideEffects: ['@prisma/client/edge'],
+    externals: {
+      inline: ['@prisma/client', '@prisma/client/edge', '.prisma/client']
+    },
+    alias: {
+      'pino-pretty': resolvePath(__dirname, 'server/stubs/empty.ts')
     }
   },
   shadcn: {
