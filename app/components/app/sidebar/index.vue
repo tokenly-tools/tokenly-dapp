@@ -3,7 +3,9 @@
     <SidebarHeader>
       <SidebarMenu>
         <SidebarMenuItem>
-          <AppLogo class="hidden justify-center px-2 py-4 md:flex" />
+          <div class="hidden h-14 w-full items-center justify-center p-2 md:flex">
+            <AppLogo class="h-full w-full" />
+          </div>
         </SidebarMenuItem>
       </SidebarMenu>
     </SidebarHeader>
@@ -16,24 +18,32 @@
             </div>
             <SidebarMenuSub v-if="item.items.length">
               <SidebarMenuSubItem v-for="childItem in item.items" :key="childItem.title">
-                <SidebarMenuSubButton
-                  as-child
-                  :disabled="childItem.isDisabled"
-                  :class="{
-                    'cursor-not-allowed opacity-50': childItem.isDisabled
-                  }"
+                <Tooltip
+                  v-if="childItem.isDisabled"
+                  :open="isMobile ? activeTooltip === childItem.title : undefined"
                 >
-                  <NuxtLink
-                    :to="childItem.to"
-                    :class="{ 'pointer-events-none': childItem.isDisabled }"
-                    class="flex items-center rounded-md px-3 py-6"
-                  >
-                    <div class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md">
-                      <component :is="childItem.icon" class="text-sidebar-primary h-4 w-4" />
-                    </div>
-                    <span>{{ childItem.title }}</span>
-                  </NuxtLink>
-                </SidebarMenuSubButton>
+                  <TooltipTrigger as-child>
+                    <AppSidebarMenuItem
+                      :title="childItem.title"
+                      :to="childItem.to"
+                      :icon="childItem.icon"
+                      :is-disabled="childItem.isDisabled"
+                      @click="
+                        isMobile ? toggleTooltip(childItem.title, $event) : undefined
+                      "
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent side="right" :side-offset="-10">
+                    <p>Coming soon</p>
+                  </TooltipContent>
+                </Tooltip>
+                <AppSidebarMenuItem
+                  v-else
+                  :title="childItem.title"
+                  :to="childItem.to"
+                  :icon="childItem.icon"
+                  :is-disabled="childItem.isDisabled"
+                />
               </SidebarMenuSubItem>
             </SidebarMenuSub>
           </SidebarMenuItem>
@@ -44,20 +54,8 @@
 </template>
 
 <script setup lang="ts">
-import {
-  Coins,
-  Gift,
-  Users,
-  Lock,
-  Image as ImageIcon,
-  Zap,
-  Send,
-  Rocket,
-  PiggyBank,
-  Vault,
-  Palette,
-  Package
-} from 'lucide-vue-next'
+import { Coins, Gift, Lock, Send, Rocket, PiggyBank, Palette } from 'lucide-vue-next'
+import { useMediaQuery } from '@vueuse/core'
 
 import {
   Sidebar,
@@ -67,17 +65,40 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
-  SidebarRail
+  SidebarMenuSubItem
 } from '@/components/ui/sidebar'
+
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 const props = defineProps<{
   className?: string
   [key: string]: any
 }>()
 
-// Navigation data for Tokenly DApp
+const isMobile = useMediaQuery('(max-width: 768px)')
+const activeTooltip = ref<string | null>(null)
+
+const toggleTooltip = (itemTitle: string, event?: Event) => {
+  event?.preventDefault()
+  event?.stopPropagation()
+  activeTooltip.value = activeTooltip.value === itemTitle ? null : itemTitle
+
+  if (activeTooltip.value === itemTitle) {
+    setTimeout(() => {
+      activeTooltip.value = null
+    }, 3000)
+  }
+}
+
+const handleClickOutside = (event: Event) => {
+  if (isMobile.value && activeTooltip.value) {
+    const target = event.target as Element
+    if (!target.closest('[data-radix-tooltip-trigger]')) {
+      activeTooltip.value = null
+    }
+  }
+}
+
 const data = {
   navMain: [
     {
@@ -90,7 +111,7 @@ const data = {
           icon: Coins
         },
         {
-          title: 'NFT minter (coming soon)',
+          title: 'NFT minter',
           to: '#',
           isDisabled: true,
           icon: Palette
@@ -102,25 +123,26 @@ const data = {
       url: '#',
       items: [
         {
-          title: 'Airdrop',
-          to: '#',
-          icon: Gift
-        },
-        {
           title: 'Multisender',
-          url: '#',
+          to: '/multisender',
           icon: Send
         },
         {
-          title: 'Launchpad (coming soon)',
-          to: '#',
+          title: 'Airdrop',
+          to: '/airdrop',
+          isDisabled: true,
+          icon: Gift
+        },
+        {
+          title: 'Launchpad',
+          to: '/launchpad',
           icon: Rocket,
           isDisabled: true,
           badge: true
         },
         {
-          title: 'Staking (coming soon)',
-          to: '#',
+          title: 'Staking',
+          to: '/staking',
           isDisabled: true,
           icon: PiggyBank
         }
@@ -132,11 +154,19 @@ const data = {
       items: [
         {
           title: 'Locker',
-          to: '#',
+          to: '/locks',
           icon: Lock
         }
       ]
     }
   ]
 }
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>

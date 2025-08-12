@@ -1,21 +1,32 @@
 <template>
-  <div>
-    <Button @click="open" v-if="!isConnected">Connect</Button>
-    <Button v-else @click="open({ view: 'Account' })">
-      <div class="hidden md:block">{{ trimmedAddress }}</div>
-      <div class="block md:hidden"><Wallet /></div>
-    </Button>
-  </div>
+  <ClientOnly>
+    <div>
+      <Button v-if="!isConnected" @click="open">Connect</Button>
+      <Button v-else @click="() => open({ view: 'Account' })">
+        <div class="hidden md:block">{{ trimmedAddress }}</div>
+        <div class="block md:hidden"><Wallet /></div>
+      </Button>
+    </div>
+    <template #fallback>
+      <div class="flex justify-end">
+        <Button disabled>Loading...</Button>
+      </div>
+    </template>
+  </ClientOnly>
 </template>
 <script setup lang="ts">
 import { Wallet } from 'lucide-vue-next'
-import { useAppKit, useAppKitAccount } from '@reown/appkit/vue'
-const { open } = useAppKit()
-const accountData = useAppKitAccount()
 
-const isConnected = computed(() => accountData.value?.isConnected)
+const { appKit, account, isConnected } = useWagmiClient()
+
+function open(options?: any) {
+  if (appKit) {
+    return options ? appKit.open(options) : appKit.open()
+  }
+}
+
 const trimmedAddress = computed(() => {
-  if (!accountData.value?.address) return ''
-  return `${accountData.value.address.slice(0, 6)}...${accountData.value.address.slice(-4)}`
+  if (!account.address.value) return ''
+  return `${account.address.value.slice(0, 6)}...${account.address.value.slice(-4)}`
 })
 </script>
