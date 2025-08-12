@@ -17,6 +17,7 @@
     "lint:fix": "eslint . --fix"
   },
   "dependencies": {
+    "@internationalized/date": "^3.8.2",
     "@nuxt/eslint": "1.7.0",
     "@prisma/adapter-d1": "^6.11.1",
     "@prisma/client": "6.11.1",

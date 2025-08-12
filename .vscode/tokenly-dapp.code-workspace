@@ -10,11 +10,11 @@
 		},
 		{
 			"path": "../app",
-			"name": "FE"
+			"name": "app"
 		},
 		{
 			"path": "../contracts",
-			"name": "BE"
+			"name": "contracts"
 		}
 	],
 	"settings": {

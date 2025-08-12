@@ -26,10 +26,18 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
-      factoryAddress: ''
+      coreMainnet: {
+        factoryAddress: '',
+        multisenderAddress: '',
+        lockerAddress: '',
+        lockerReaderAddress: ''
+      },
+      coreTestnet2: {
+        factoryAddress: '',
+        multisenderAddress: '',
+        lockerAddress: '',
+        lockerReaderAddress: ''
+      }
     }
-  },
-  vueSonner: {
-    css: true
   }
 })

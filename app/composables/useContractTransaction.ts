@@ -10,6 +10,7 @@ export function useContractTransaction(options: UseContractTransactionOptions = 
   const { account, writeContract, receipt } = useWagmiClient()
   const { $toast } = useNuxtApp()
   const { address: connectedAddress, isConnected } = account
+  const { txUrl } = useExplorer()
   const {
     writeContract: originalWriteContractFn,
     data: hash,
@@ -86,7 +87,7 @@ export function useContractTransaction(options: UseContractTransactionOptions = 
         action: {
           label: 'View',
           onClick: () => {
-            window.open(`https://etherscan.io/tx/${hash.value}`, '_blank')
+            window.open(txUrl(hash.value), '_blank')
           }
         }
       })
@@ -104,7 +105,7 @@ export function useContractTransaction(options: UseContractTransactionOptions = 
           action: {
             label: 'View',
             onClick: () => {
-              window.open(`https://etherscan.io/tx/${hash.value}`, '_blank')
+              window.open(txUrl(hash.value), '_blank')
             }
           }
         })

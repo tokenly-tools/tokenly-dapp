@@ -55,7 +55,6 @@
 
 <script setup lang="ts">
 import { Coins, Gift, Lock, Send, Rocket, PiggyBank, Palette } from 'lucide-vue-next'
-import { ref, onMounted, onUnmounted } from 'vue'
 import { useMediaQuery } from '@vueuse/core'
 
 import {
@@ -124,25 +123,26 @@ const data = {
       url: '#',
       items: [
         {
-          title: 'Airdrop',
-          to: '#',
-          icon: Gift
-        },
-        {
           title: 'Multisender',
-          to: '#',
+          to: '/multisender',
           icon: Send
         },
         {
+          title: 'Airdrop',
+          to: '/airdrop',
+          isDisabled: true,
+          icon: Gift
+        },
+        {
           title: 'Launchpad',
-          to: '#',
+          to: '/launchpad',
           icon: Rocket,
           isDisabled: true,
           badge: true
         },
         {
           title: 'Staking',
-          to: '#',
+          to: '/staking',
           isDisabled: true,
           icon: PiggyBank
         }
@@ -154,7 +154,7 @@ const data = {
       items: [
         {
           title: 'Locker',
-          to: '#',
+          to: '/locks',
           icon: Lock
         }
       ]
