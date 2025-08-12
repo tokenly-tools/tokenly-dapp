@@ -59,12 +59,12 @@
         <div class="mx-2 flex gap-4">
           <NuxtLink
             :to="`/locks?token=${mintedTokenAddress}`"
-            class="flex items-center hover:underline"
+            class="flex items-center underline"
             ><Lock class="mr-1" :size="16" /> Lock it in!</NuxtLink
           >
           <NuxtLink
             :to="`/multisender?token=${mintedTokenAddress}`"
-            class="flex items-center hover:underline"
+            class="flex items-center underline"
             ><Send class="mr-1" :size="16" /> Multisend it!</NuxtLink
           >
         </div>

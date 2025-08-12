@@ -10,8 +10,7 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()]
   },
   nitro: {
-    preset: 'cloudflare_pages',
-    modules: ['nitro-cloudflare-dev'],
+    preset: 'cloudflare_module',
     cloudflare: {
       deployConfig: true,
       nodeCompat: true

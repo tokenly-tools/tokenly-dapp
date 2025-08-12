@@ -11,8 +11,14 @@
       class="relative mb-2 flex w-max items-center gap-2 overflow-hidden rounded-full px-4 py-2 text-sm font-medium"
       :class="colorMap[color].bgBadgeColor"
     >
-      <div class="flex items-center gap-2 transition-transform duration-300 group-hover:-translate-x-6">
-        <component :is="icon" :size="20" class="transition-opacity duration-300 group-hover:opacity-0" />
+      <div
+        class="flex items-center gap-2 transition-transform duration-300 group-hover:-translate-x-6"
+      >
+        <component
+          :is="icon"
+          :size="20"
+          class="transition-opacity duration-300 group-hover:opacity-0"
+        />
         <span>{{ title }}</span>
       </div>
       <ArrowRight

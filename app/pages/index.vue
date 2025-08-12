@@ -9,12 +9,23 @@
         color="orange"
         to="/mint/token"
       />
-      <AppCard
-        title="Airdrop"
-        :icon="Gift"
-        description="Airdrop tokens/NFTs"
-        color="amber"
-      />
+      <div class="relative">
+        <AppCard
+          title="Airdrop"
+          :icon="Gift"
+          description="Airdrop tokens/NFTs"
+          color="amber"
+        />
+        <div
+          class="absolute inset-0 z-10 grid place-items-center rounded-2xl bg-black/40 backdrop-blur-[1px]"
+        >
+          <span
+            class="rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white"
+          >
+            Coming soon
+          </span>
+        </div>
+      </div>
       <AppCard
         title="Multisender"
         :icon="Send"
