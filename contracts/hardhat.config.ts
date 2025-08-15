@@ -23,9 +23,14 @@ const config: HardhatUserConfig = {
       url: 'http://127.0.0.1:8545',
       chainId: 31337
     },
+    coreMainnet: {
+      url: 'https://rpc.coredao.org',
+      accounts: vars.has('CORE_DEPLOYER') ? [vars.get('CORE_DEPLOYER')] : [],
+      chainId: 1116
+    },
     coreTestnet2: {
       url: 'https://rpc.test2.btcs.network',
-      accounts: vars.has('PRIVATE_KEY') ? [vars.get('PRIVATE_KEY')] : [],
+      accounts: vars.has('CORE_DEPLOYER') ? [vars.get('CORE_DEPLOYER')] : [],
       chainId: 1114
     }
   },
